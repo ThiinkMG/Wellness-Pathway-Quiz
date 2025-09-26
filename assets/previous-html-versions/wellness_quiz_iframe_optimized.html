@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discover Your Wellness Pathway</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            padding: 10px;
+            /* Iframe-specific optimizations */
+            overflow-x: hidden;
+        }
+
+        /* Detect if we're in an iframe and adjust accordingly */
+        .quiz-container {
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            /* Fixed height to prevent iframe scrolling issues */
+            min-height: 700px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quiz-header {
+            background: linear-gradient(135deg, #2ecc71 0%, #1A237E 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .reset-icon {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+        }
+
+        .reset-icon:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .reset-icon:active {
+            transform: rotate(180deg) scale(0.95);
+        }
+
+
+        .quiz-header h1 {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .quiz-header .tagline {
+            font-size: 0.85em;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .quiz-content {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .intro-text {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2ecc71;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #1A237E);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .question-container {
+            display: none;
+            animation: fadeIn 0.4s ease;
+            flex-grow: 1;
+        }
+
+        .question-container.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-number {
+            color: #2ecc71;
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .question {
+            font-size: 1em;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+            position: relative;
+        }
+
+        .option:hover {
+            border-color: #2ecc71;
+            background: #f0fff4;
+            transform: translateY(-1px);
+        }
+
+        .option.selected {
+            border-color: #2ecc71;
+            background: #e8f5e8;
+            box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 80px;
+        }
+
+        .prev-btn {
+            background: #f8f9fa;
+            color: #666;
+            border: 2px solid #e9ecef;
+        }
+
+        .prev-btn:hover:not(:disabled) {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .next-btn {
+            background: #2ecc71;
+            color: white;
+            border: 2px solid #2ecc71;
+        }
+
+        .next-btn:hover:not(:disabled) {
+            background: #27ae60;
+            border-color: #27ae60;
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .results-container {
+            display: none;
+            animation: fadeIn 0.5s ease;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: calc(100% - 20px);
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .results-title {
+            color: #2ecc71;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .dimension-result {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .dimension-name {
+            font-weight: 600;
+            color: #2ecc71;
+            font-size: 1em;
+            margin-bottom: 6px;
+        }
+
+        .dimension-description {
+            color: #555;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .tips-section {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+
+        .tips-title {
+            font-weight: 600;
+            color: #1A237E;
+            font-size: 0.85em;
+            margin-bottom: 6px;
+        }
+
+        .tip {
+            color: #666;
+            font-size: 0.8em;
+            margin-bottom: 4px;
+            padding-left: 12px;
+            position: relative;
+        }
+
+        .tip:before {
+            content: "✓";
+            color: #2ecc71;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .faq-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .faq-title {
+            color: #1A237E;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .faq-intro {
+            color: #555;
+            font-size: 0.9em;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .faq-toggle {
+            background: #2ecc71;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.9em;
+        }
+
+        .faq-toggle:hover {
+            background: #27ae60;
+            transform: translateY(-1px);
+        }
+
+        .faq-arrow {
+            transition: transform 0.3s ease;
+            font-size: 0.8em;
+        }
+
+        .faq-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .faq-content.expanded {
+            max-height: 400px;
+        }
+
+        .dimension-guide {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .guide-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #2ecc71;
+        }
+
+        .guide-name {
+            font-weight: 600;
+            color: #1A237E;
+            margin-bottom: 4px;
+            font-size: 0.9em;
+        }
+
+        .guide-desc {
+            color: #666;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+
+        .results-guide {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .results-guide h4 {
+            color: #1A237E;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .guide-point {
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .guide-point strong {
+            color: #1A237E;
+        }
+
+        .how-to-read-section {
+            background: #fff;
+            border: 2px solid #2ecc71;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .how-to-read-title {
+            color: #2ecc71;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .how-to-read-point {
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            color: #555;
+            line-height: 1.4;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #2ecc71;
+        }
+
+        .how-to-read-point strong {
+            color: #1A237E;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #2ecc71 0%, #1A237E 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .cta-title {
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .cta-text {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .cta-btn {
+            background: white;
+            color: #2ecc71;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9em;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .restart-btn {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-top: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .restart-btn:hover {
+            background: white;
+            color: #2ecc71;
+        }
+
+        /* Iframe-specific optimizations */
+        @media (max-height: 800px) {
+            .quiz-container {
+                min-height: 100vh;
+                border-radius: 0;
+            }
+
+            body {
+                padding: 0;
+            }
+
+            .quiz-header {
+                padding: 15px;
+            }
+
+            .quiz-content {
+                padding: 12px;
+            }
+        }
+
+        /* Mobile responsiveness for iframe */
+        @media (max-width: 600px) {
+            .quiz-header h1 {
+                font-size: 1.3em;
+            }
+
+            .quiz-header .tagline {
+                font-size: 0.8em;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            .option {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <div class="reset-icon" onclick="confirmReset()" title="Reset Quiz">
+                ↻
+            </div>
+            <h1>Discover Your Wellness Pathway</h1>
+            <p class="tagline">Every Person's Journey is Personal</p>
+        </div>
+
+        <div class="quiz-content">
+            <div class="intro-text">
+                At The Carrington Clinic, we believe your journey to wellness is as unique as you are. This gentle assessment will help you discover which dimensions of wellness you naturally embrace and which areas might benefit from some extra care and attention. Remember, there are no right or wrong answers - only insights to guide your personal path forward.
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Questions will be dynamically inserted here -->
+            <div id="questionsContainer"></div>
+
+            <div class="navigation">
+                <button class="nav-btn prev-btn" id="prevBtn" onclick="previousQuestion()" disabled>Previous</button>
+                <button class="nav-btn next-btn" id="nextBtn" onclick="nextQuestion()" disabled>Next</button>
+            </div>
+
+            <div class="results-container" id="resultsContainer">
+                <div class="results-header">
+                    <h2 class="results-title">Your Personal Wellness Compass</h2>
+                    <p>Here's what we discovered about your wellness journey:</p>
+                </div>
+                <div id="resultsContent"></div>
+
+                <div class="how-to-read-section">
+                    <h3 class="how-to-read-title">How to Read Your Results</h3>
+                    <div class="how-to-read-point">
+                        <strong>🌟 Your Strengths:</strong> These are dimensions where you naturally excel. Use these as foundations to support growth in other areas.
+                    </div>
+                    <div class="how-to-read-point">
+                        <strong>🌱 Ready for Growth:</strong> These areas offer opportunities for development. Small, consistent steps can make a big difference.
+                    </div>
+                    <div class="how-to-read-point">
+                        <strong>Remember:</strong> Wellness is not about perfection—it's about awareness, balance, and taking small steps toward feeling your best.
+                    </div>
+                </div>
+
+                <div class="faq-section">
+                    <h3 class="faq-title">Understanding Your Results</h3>
+                    <div class="faq-intro">
+                        Your results highlight your natural wellness strengths and areas ready for growth. Here's what each dimension means:
+                    </div>
+
+                    <div class="faq-toggle" onclick="toggleFAQ()">
+                        <span id="faqToggleText">Show 8 Dimensions Guide</span>
+                        <span class="faq-arrow" id="faqArrow">▼</span>
+                    </div>
+
+                    <div class="faq-content" id="faqContent">
+                        <div class="dimension-guide">
+                            <div class="guide-item">
+                                <div class="guide-name">🏃‍♀️ Physical Wellness</div>
+                                <div class="guide-desc">Your relationship with movement, nutrition, sleep, and overall body care.</div>
+                            </div>
+
+                            <div class="guide-item">
+                                <div class="guide-name">💙 Emotional Wellness</div>
+                                <div class="guide-desc">How you understand, express, and manage your feelings in healthy ways.</div>
+                            </div>
+
+                            <div class="guide-item">
+                                <div class="guide-name">👥 Social Wellness</div>
+                                <div class="guide-desc">The quality of your relationships and sense of connection with others.</div>
+                            </div>
+
+                            <div class="guide-item">
+                                <div class="guide-name">🧠 Intellectual Wellness</div>
+                                <div class="guide-desc">Your curiosity, creativity, and commitment to lifelong learning and growth.</div>
+                            </div>
+
+                            <div class="guide-item">
+                                <div class="guide-name">🕊️ Spiritual Wellness</div>
+                                <div class="guide-desc">Your sense of purpose, meaning, and connection to something greater than yourself.</div>
+                            </div>
+
+                            <div class="guide-item">
+                                <div class="guide-name">💼 Occupational Wellness</div>
+                                <div class="guide-desc">Finding satisfaction and purpose in your work and maintaining work-life balance.</div>
+                            </div>
+
+                            <div class="guide-item">
+                                <div class="guide-name">🌍 Environmental Wellness</div>
+                                <div class="guide-desc">How your surroundings affect your well-being and your impact on the world around you.</div>
+                            </div>
+
+                            <div class="guide-item">
+                                <div class="guide-name">💰 Financial Wellness</div>
+                                <div class="guide-desc">Your relationship with money, financial security, and planning for the future.</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <h3 class="cta-title">Ready to Take the Next Step?</h3>
+                    <p class="cta-text">Our compassionate team is here to support you on your personal wellness journey.</p>
+                    <button class="cta-btn" onclick="openExternalLink('https://www.thecarringtonclinic.com/')">Connect With Us</button>
+                    <br>
+                    <button class="restart-btn" onclick="restartQuiz()">Take Quiz Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define reset functions first so they're available immediately
+        function confirmReset() {
+            if (typeof currentQuestion !== 'undefined' && currentQuestion === 0 && typeof answers !== 'undefined' && Object.keys(answers).length === 0) {
+                return; // Already at start, no need to reset
+            }
+
+            if (confirm('Are you sure you want to start the quiz over? Your current progress will be lost.')) {
+                restartQuiz();
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            answers = {};
+            dimensionScores = {};
+
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('questionsContainer').style.display = 'block';
+            document.querySelector('.navigation').style.display = 'flex';
+            document.querySelector('.progress-bar').style.display = 'block';
+
+            initializeQuiz();
+            updateNavButtons();
+        }
+
+        // Make functions globally accessible immediately
+        window.confirmReset = confirmReset;
+        window.restartQuiz = restartQuiz;
+
+        // Iframe height communication
+        function notifyParentOfHeightChange() {
+            try {
+                const height = Math.max(
+                    document.body.scrollHeight,
+                    document.body.offsetHeight,
+                    document.documentElement.clientHeight,
+                    document.documentElement.scrollHeight,
+                    document.documentElement.offsetHeight
+                );
+
+                if (window.parent !== window) {
+                    window.parent.postMessage({
+                        type: 'resize',
+                        height: height
+                    }, '*');
+                }
+            } catch (e) {
+                // Silently fail if postMessage is restricted
+            }
+        }
+
+        // Safe external link handling for iframes
+        function openExternalLink(url) {
+            try {
+                if (window.top !== window) {
+                    // We're in an iframe, try to open in parent
+                    window.parent.open(url, '_blank');
+                } else {
+                    // We're not in an iframe, open normally
+                    window.open(url, '_blank');
+                }
+            } catch (e) {
+                // Fallback: try to navigate the parent window
+                try {
+                    window.parent.location = url;
+                } catch (e2) {
+                    // Last resort: navigate current window
+                    window.location = url;
+                }
+            }
+        }
+
+        const questions = [
+            {
+                text: "When you're feeling stressed, what helps you feel most grounded?",
+                options: [
+                    { text: "Going for a walk or doing physical exercise", dimensions: ["physical"] },
+                    { text: "Talking with close friends or family", dimensions: ["social"] },
+                    { text: "Taking time for quiet reflection or meditation", dimensions: ["spiritual"] },
+                    { text: "Learning something new or reading", dimensions: ["intellectual"] }
+                ]
+            },
+            {
+                text: "What gives you the greatest sense of accomplishment?",
+                options: [
+                    { text: "Completing a challenging project at work", dimensions: ["occupational"] },
+                    { text: "Helping others in your community", dimensions: ["social"] },
+                    { text: "Reaching a personal fitness goal", dimensions: ["physical"] },
+                    { text: "Managing your finances well", dimensions: ["financial"] }
+                ]
+            },
+            {
+                text: "How do you typically process difficult emotions?",
+                options: [
+                    { text: "I talk through them with trusted people", dimensions: ["social", "emotional"] },
+                    { text: "I take time for self-reflection and journaling", dimensions: ["emotional", "spiritual"] },
+                    { text: "I try to understand the science behind them", dimensions: ["intellectual", "emotional"] },
+                    { text: "I focus on what I can control and take action", dimensions: ["emotional", "occupational"] }
+                ]
+            },
+            {
+                text: "What environment makes you feel most at peace?",
+                options: [
+                    { text: "A clean, organized space with natural light", dimensions: ["environmental"] },
+                    { text: "Surrounded by nature outdoors", dimensions: ["environmental", "physical"] },
+                    { text: "A cozy space with loved ones nearby", dimensions: ["social", "environmental"] },
+                    { text: "A quiet space for contemplation", dimensions: ["spiritual", "environmental"] }
+                ]
+            },
+            {
+                text: "When making important life decisions, you tend to:",
+                options: [
+                    { text: "Research thoroughly and consider all options", dimensions: ["intellectual"] },
+                    { text: "Follow your gut feelings and values", dimensions: ["spiritual", "emotional"] },
+                    { text: "Seek advice from people you trust", dimensions: ["social"] },
+                    { text: "Consider the financial implications first", dimensions: ["financial"] }
+                ]
+            },
+            {
+                text: "What motivates you most in your daily life?",
+                options: [
+                    { text: "Building meaningful relationships", dimensions: ["social"] },
+                    { text: "Personal growth and learning", dimensions: ["intellectual", "spiritual"] },
+                    { text: "Financial security and stability", dimensions: ["financial"] },
+                    { text: "Feeling physically strong and healthy", dimensions: ["physical"] }
+                ]
+            },
+            {
+                text: "How do you prefer to recharge after a long day?",
+                options: [
+                    { text: "Physical activity or movement", dimensions: ["physical"] },
+                    { text: "Connecting with friends or family", dimensions: ["social"] },
+                    { text: "Engaging in a hobby or creative activity", dimensions: ["intellectual"] },
+                    { text: "Spending time in a peaceful environment", dimensions: ["environmental", "spiritual"] }
+                ]
+            },
+            {
+                text: "What aspect of your life do you feel most confident about?",
+                options: [
+                    { text: "Your ability to maintain relationships", dimensions: ["social"] },
+                    { text: "Your work or career path", dimensions: ["occupational"] },
+                    { text: "Your physical health habits", dimensions: ["physical"] },
+                    { text: "Your emotional resilience", dimensions: ["emotional"] }
+                ]
+            }
+        ];
+
+        const dimensionInfo = {
+            physical: {
+                name: "Physical Wellness",
+                description: "You have a natural awareness of your body's needs and understand the importance of movement, nutrition, and rest.",
+                tips: ["Try 20-30 minutes of daily movement", "Focus on balanced, nourishing meals", "Prioritize 7-9 hours of quality sleep"]
+            },
+            emotional: {
+                name: "Emotional Wellness",
+                description: "You're developing strong skills for understanding and managing your emotions in healthy ways.",
+                tips: ["Practice daily mindfulness or breathing exercises", "Keep a mood journal", "Seek support when emotions feel overwhelming"]
+            },
+            social: {
+                name: "Social Wellness",
+                description: "You value meaningful connections and understand the importance of healthy relationships.",
+                tips: ["Schedule regular time with loved ones", "Practice active listening", "Join groups aligned with your interests"]
+            },
+            intellectual: {
+                name: "Intellectual Wellness",
+                description: "You're curious about the world and committed to lifelong learning and personal growth.",
+                tips: ["Set aside time for reading or learning", "Engage in stimulating conversations", "Try new hobbies or skills"]
+            },
+            spiritual: {
+                name: "Spiritual Wellness",
+                description: "You're connected to your values and seeking meaning and purpose in your life.",
+                tips: ["Spend time in quiet reflection", "Connect with nature regularly", "Explore what gives your life meaning"]
+            },
+            occupational: {
+                name: "Occupational Wellness",
+                description: "You understand the importance of finding purpose and satisfaction in your work and daily activities.",
+                tips: ["Set meaningful goals at work", "Seek work-life balance", "Consider how your work aligns with your values"]
+            },
+            environmental: {
+                name: "Environmental Wellness",
+                description: "You're aware of how your surroundings affect your well-being and seek harmony with your environment.",
+                tips: ["Create organized, peaceful spaces", "Spend time in nature", "Reduce clutter in your living areas"]
+            },
+            financial: {
+                name: "Financial Wellness",
+                description: "You're developing healthy relationships with money and working toward financial security.",
+                tips: ["Create a simple budget", "Build an emergency fund gradually", "Seek financial education resources"]
+            }
+        };
+
+        let currentQuestion = 0;
+        let answers = {};
+        let dimensionScores = {};
+
+        function initializeQuiz() {
+            // Initialize dimension scores
+            Object.keys(dimensionInfo).forEach(dim => {
+                dimensionScores[dim] = 0;
+            });
+
+            renderQuestion(currentQuestion);
+            updateProgress();
+            notifyParentOfHeightChange();
+        }
+
+        function renderQuestion(questionIndex) {
+            const container = document.getElementById('questionsContainer');
+            const question = questions[questionIndex];
+
+            container.innerHTML = `
+                <div class="question-container active">
+                    <div class="question-number">Question ${questionIndex + 1} of ${questions.length}</div>
+                    <div class="question">${question.text}</div>
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <div class="option" onclick="selectOption(${questionIndex}, ${index})">
+                                ${option.text}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            // Notify parent of potential height change
+            setTimeout(notifyParentOfHeightChange, 100);
+        }
+
+        function selectOption(questionIndex, optionIndex) {
+            // Clear previous selections
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            // Select current option
+            document.querySelectorAll('.option')[optionIndex].classList.add('selected');
+
+            // Store answer
+            answers[questionIndex] = optionIndex;
+
+            // Enable next button
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion(currentQuestion);
+                updateProgress();
+                updateNavButtons();
+            } else {
+                calculateResults();
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                renderQuestion(currentQuestion);
+                updateProgress();
+                updateNavButtons();
+
+                // Re-select previous answer if it exists
+                if (answers[currentQuestion] !== undefined) {
+                    document.querySelectorAll('.option')[answers[currentQuestion]].classList.add('selected');
+                    document.getElementById('nextBtn').disabled = false;
+                }
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.disabled = currentQuestion === 0;
+            nextBtn.disabled = answers[currentQuestion] === undefined;
+
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.textContent = 'See Results';
+            } else {
+                nextBtn.textContent = 'Next';
+            }
+        }
+
+        function calculateResults() {
+            // Reset scores
+            Object.keys(dimensionScores).forEach(dim => {
+                dimensionScores[dim] = 0;
+            });
+
+            // Calculate scores based on answers
+            Object.keys(answers).forEach(questionIndex => {
+                const answerIndex = answers[questionIndex];
+                const question = questions[questionIndex];
+                const selectedOption = question.options[answerIndex];
+
+                selectedOption.dimensions.forEach(dimension => {
+                    dimensionScores[dimension]++;
+                });
+            });
+        }
+
+        function showResults() {
+            // Hide quiz content
+            document.getElementById('questionsContainer').style.display = 'none';
+            document.querySelector('.navigation').style.display = 'none';
+            document.querySelector('.progress-bar').style.display = 'none';
+
+            // Get top dimensions
+            const sortedDimensions = Object.entries(dimensionScores)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3);
+
+            // Show results
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsContent = document.getElementById('resultsContent');
+
+            let resultsHTML = '';
+
+            sortedDimensions.forEach((dimension, index) => {
+                const [dimKey, score] = dimension;
+                const info = dimensionInfo[dimKey];
+                const isStrength = index < 2;
+
+                resultsHTML += `
+                    <div class="dimension-result">
+                        <div class="dimension-name">
+                            ${isStrength ? '🌟' : '🌱'} ${info.name} ${isStrength ? '(Your Strength)' : '(Ready for Growth)'}
+                        </div>
+                        <div class="dimension-description">${info.description}</div>
+                        <div class="tips-section">
+                            <div class="tips-title">Ways to Nurture This Dimension:</div>
+                            ${info.tips.map(tip => `<div class="tip">${tip}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsContent.innerHTML = resultsHTML;
+            resultsContainer.style.display = 'block';
+
+            // Notify parent of height change after results are shown
+            setTimeout(notifyParentOfHeightChange, 300);
+        }
+
+        function toggleFAQ() {
+            const content = document.getElementById('faqContent');
+            const arrow = document.getElementById('faqArrow');
+            const toggleText = document.getElementById('faqToggleText');
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                arrow.classList.remove('rotated');
+                toggleText.textContent = 'Show 8 Dimensions Guide';
+            } else {
+                content.classList.add('expanded');
+                arrow.classList.add('rotated');
+                toggleText.textContent = 'Hide 8 Dimensions Guide';
+            }
+
+            // Notify parent of height change
+            setTimeout(notifyParentOfHeightChange, 350);
+        }
+
+        // Initialize quiz when page loads
+        window.addEventListener('load', () => {
+            initializeQuiz();
+            // Initial height notification
+            setTimeout(notifyParentOfHeightChange, 500);
+        });
+
+        // Listen for resize events and notify parent
+        window.addEventListener('resize', () => {
+            setTimeout(notifyParentOfHeightChange, 100);
+        });
+    </script>
+</body>
+</html>
