@@ -879,6 +879,9 @@
             <div class="menu-item" onclick="openModal('dimensionsModal', event)">
                 <span class="menu-item-icon">🎯</span>About the 8 Dimensions
             </div>
+            <div class="menu-item" onclick="openQuizInNewTab(event)">
+                <span class="menu-item-icon">🌐</span>Open Quiz in New Tab
+            </div>
             <div class="menu-item" onclick="openExternalLink('https://www.thecarringtonclinic.com/', event)">
                 <span class="menu-item-icon">📅</span>Schedule an Appointment
             </div>
@@ -1204,6 +1207,30 @@
             }
         }
 
+        // Open quiz in new tab (redirect to GitHub Pages URL)
+        function openQuizInNewTab(event) {
+            if (event) event.preventDefault();
+            closeSideMenu(); // Close menu first
+            const quizUrl = 'https://thiinkmg.github.io/Wellness-Pathway-Quiz/wellness_quiz_enhanced.html';
+            try {
+                if (window.top !== window) {
+                    // We're in an iframe, try to open in parent
+                    window.parent.open(quizUrl, '_blank');
+                } else {
+                    // We're not in an iframe, open normally
+                    window.open(quizUrl, '_blank');
+                }
+            } catch (e) {
+                // Fallback: try to navigate the parent window
+                try {
+                    window.parent.open(quizUrl, '_blank');
+                } catch (e2) {
+                    // Last resort: open in current window
+                    window.open(quizUrl, '_blank');
+                }
+            }
+        }
+
         // Make functions globally accessible immediately
         window.confirmReset = confirmReset;
         window.restartQuiz = restartQuiz;
@@ -1212,6 +1239,7 @@
         window.openModal = openModal;
         window.closeModal = closeModal;
         window.openExternalLink = openExternalLink;
+        window.openQuizInNewTab = openQuizInNewTab;
 
         // Iframe height communication
         function notifyParentOfHeightChange() {
