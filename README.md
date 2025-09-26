@@ -5,7 +5,7 @@ A comprehensive, interactive wellness assessment tool designed to help individua
 
 ## 🌐 Live Demo
 
-**[Take the Quiz Now →](https://yourusername.github.io/wellness-pathway-quiz/)**
+**[Take the Quiz Now →](https://thiinkmg.github.io/Wellness-Pathway-Quiz/wellness_quiz_enhanced.html)**
 
 ## 🌟 Features
 
@@ -24,7 +24,7 @@ Simply visit the GitHub Pages link above to take the quiz immediately.
 ### Embed in Your Website
 ```html
 <iframe
-    src="https://yourusername.github.io/wellness-pathway-quiz/wellness_quiz_enhanced.html"
+    src="https://thiinkmg.github.io/Wellness-Pathway-Quiz/wellness_quiz_enhanced.html"
     width="100%"
     height="800px"
     frameborder="0"
